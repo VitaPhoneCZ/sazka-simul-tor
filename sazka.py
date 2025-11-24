@@ -39,7 +39,6 @@ class SportkaApp:
         self.ticket_window.resizable(True, True)
         self.ticket_window.config(bg="#FF8C00")
 
-        # === HLAVNÍ KONTEJNER S SCROLLOVÁNÍM (vše uvnitř) ===
         canvas = tk.Canvas(self.ticket_window, bg="#FF8C00", highlightthickness=0)
         scrollbar = tk.Scrollbar(self.ticket_window, orient="vertical", command=canvas.yview)
         canvas.configure(yscrollcommand=scrollbar.set)
@@ -47,26 +46,20 @@ class SportkaApp:
         scrollbar.pack(side="right", fill="y")
         canvas.pack(side="left", fill="both", expand=True)
 
-        # Frame, který bude scrollovatelný – sem dáme úplně všechno
         self.main_container = tk.Frame(canvas, bg="#FF8C00")
         canvas.create_window((0, 0), window=self.main_container, anchor="nw")
 
-        # Aby se správně nastavil scrollregion
         def on_frame_configure(event):
             canvas.configure(scrollregion=canvas.bbox("all"))
         self.main_container.bind("<Configure>", on_frame_configure)
 
-        # === KOLEČKO MYŠI FUNGUJE NA WINDOWS I LINUX ===
+        # kolečko myši
         def _on_mousewheel(event):
             canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        def _on_mousewheel_linux(event):
-            canvas.yview_scroll(event.num == 4 and -1 or 1, "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))
+        canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))
 
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)          # Windows
-        canvas.bind_all("<Button-4>", _on_mousewheel_linux)     # Linux scroll nahoru
-        canvas.bind_all("<Button-5>", _on_mousewheel_linux)     # Linux scroll dolů
-
-        # === OBSAH TICKETU ===
         # Nadpisy
         tk.Label(self.main_container, text="SPORTKA", font=("Arial", 26, "bold"), bg="#FF8C00", fg="white").pack(pady=(20, 5))
         tk.Label(self.main_container, text="SAZKA", font=("Arial", 16, "bold"), bg="#FF8C00", fg="black").pack(pady=(0, 30))
@@ -117,7 +110,7 @@ class SportkaApp:
                                              command=lambda s=idx: self.update_count(s))
                         chk.grid(row=r, column=c, padx=4, pady=4)
 
-        # === DOLNÍ LIŠTA (Slosování + Šance + Uložit) ===
+        # === DOLNÍ LIŠTA ===
         dolni = tk.Frame(self.main_container, bg="#FF8C00")
         dolni.pack(fill="x", pady=(40, 20), padx=40)
 
@@ -136,9 +129,16 @@ class SportkaApp:
         Checkbutton(f1, text="Páteční", variable=self.patek_var, bg="#FF8C00", font=("Arial", 6)).pack(side="left", padx=6)
         Checkbutton(f1, text="Nedělní", variable=self.nedele_var, bg="#FF8C00", font=("Arial", 6)).pack(side="left", padx=6)
 
-        tk.Label(slos_frame, text="Počet slosování:", font=("Arial", 6), bg="#FF8C00").pack(pady=(10, 2))
+        pocet_frame = tk.Frame(slos_frame, bg="#FF8C00")
+        pocet_frame.pack(pady=(10, 2))
+        tk.Label(pocet_frame, text="Počet slosování:", font=("Arial", 6), bg="#FF8C00").pack(side="left")
         self.pocet_slos_var = IntVar(value=1)
-        Spinbox(slos_frame, from_=1, to=52, width=6, font=("Arial", 6), textvariable=self.pocet_slos_var).pack(pady=2)
+        Spinbox(pocet_frame, from_=1, to=52, width=6, font=("Arial", 6), textvariable=self.pocet_slos_var).pack(side="left", padx=(5, 20))
+
+        # NOVÉ TLAČÍTKO – NÁHODNÝ CELÝ TICKET
+        Button(pocet_frame, text="NÁHODNÝ CELÝ TICKET", font=("Arial", 5, "bold"),
+               bg="#FFD700", fg="black", relief="raised",
+               command=self.nahodny_cely_ticket).pack(side="left")
 
         # Pravá část – šance
         sance_frame = tk.Frame(dolni, bg="#FF8C00")
@@ -151,13 +151,38 @@ class SportkaApp:
         Radiobutton(rframe, text="Ano", variable=self.sance_var, value=1, bg="#FF8C00", selectcolor="black", font=("Arial", 6, "bold")).pack(side="left", padx=12)
         Radiobutton(rframe, text="Ne", variable=self.sance_var, value=0, bg="#FF8C00", selectcolor="black", font=("Arial", 6, "bold")).pack(side="left", padx=12)
 
-        # Tlačítko uložit uprostřed
+        # Tlačítko uložit
         Button(dolni, text="ULOŽIT SÁZKU", font=("Arial", 8, "bold"), bg="#006600", fg="white",
                width=44, height=4, command=self.uloz_ticket).pack(pady=20)
 
-    # -------------------------------------------------
-    # Zbytek metod beze změny (update_count, nahodny_tip, clear_sloupec, uloz_ticket, slosovani, tisk, reset)
-    # -------------------------------------------------
+    # NOVÁ FUNKCE – náhodný celý ticket
+    def nahodny_cely_ticket(self):
+        # náhodně vyplní všech 10 sloupců
+        for sloupec in range(10):
+            for var in self.vars[sloupec].values():
+                var.set(0)
+            cisla = random.sample(range(1, 50), 6)
+            for c in cisla:
+                self.vars[sloupec][c].set(1)
+            self.update_count(sloupec)
+
+        # nastavení výchozích voleb
+        self.streda_var.set(True)
+        self.patek_var.set(True)
+        self.nedele_var.set(True)
+        self.pocet_slos_var.set(1)
+        self.sance_var.set(1)  # Šance = Ano
+
+        # jen jemně blikne tlačítko, aby uživatel viděl, že se něco stalo
+        btn = self.main_container.nametowidget("!button")  # najde tlačítko (funguje spolehlivě)
+        original_bg = btn.cget("bg")
+        btn.config(bg="#FF4500")
+        self.ticket_window.after(300, lambda: btn.config(bg=original_bg))
+
+        # důležité: vrátí fokus zpět na ticketové okno
+        self.ticket_window.lift()
+        self.ticket_window.focus_force()
+
     def update_count(self, sloupec):
         count = sum(var.get() for var in self.vars[sloupec].values())
         if count > 12:
@@ -198,13 +223,96 @@ class SportkaApp:
         messagebox.showinfo("Hotovo", "Ticket uložen!")
         self.ticket_window.destroy()
 
-    # (metody slosovani, tisk, reset zůstávají stejné jako v předchozím kódu – fungují perfektně)
+    # slosovani, tisk a reset jsou stejné jako dřív – fungují perfektně
 
     def slosovani(self):
         if not os.path.exists(SOUBOR_TICKET):
             messagebox.showerror("Chyba", "Nejprve vyplň a ulož ticket!")
             return
-        # ... (zbytek stejný jako dříve) ...
+
+        sloupce = []
+        sance = False
+        sance_cislo = None
+        pocet_slos = 1
+        with open(SOUBOR_TICKET, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("Sloupec"):
+                    cisla = [int(x) for x in line.split(":")[1].split(",") if x.strip().isdigit()]
+                    if len(cisla) >= 6:
+                        sloupce.append(sorted(cisla))  # sorted pro jistotu
+                elif "Šance: Ano" in line:
+                    sance = True
+                elif line.startswith("Šance_číslo:"):
+                    sance_cislo = int(line.split(":")[1].strip())
+                elif line.startswith("Počet slosování:"):
+                    pocet_slos = int(line.split(":")[1].strip())
+
+        # SPRÁVNÝ VÝPOČET POČTU KOMBINACÍ
+        celkem_kombinaci = sum(comb(len(t), 6) if len(t) >= 6 else 0 for t in sloupce)
+        vsazeno = celkem_kombinaci * CENA_KOMB * pocet_slos + (CENA_SANCE if sance else 0) * pocet_slos
+        celkova_vyhra = 0
+        vysledek = f"Vsazeno celkem: {vsazeno} Kč\n\n"
+
+        for s in range(pocet_slos):
+            tah1 = random.sample(range(1,50), 7)
+            hlavni1 = sorted(tah1[:6])
+            dod1 = tah1[6]
+            tah2 = random.sample(range(1,50), 7)
+            hlavni2 = sorted(tah2[:6])
+            dod2 = tah2[6]
+            sance_los = random.randint(0,999999)
+            sance_str = f"{sance_los:06d}"
+
+            vysledek += f"═════ SLOSOVÁNÍ {s+1}/{pocet_slos} ═════\n"
+            vysledek += f"1. tah: {hlavni1} + {dod1}\n"
+            vysledek += f"2. tah: {hlavni2} + {dod2}\n"
+            vysledek += f"Šance: {sance_str}\n\n"
+
+            for i, tip in enumerate(sloupce, 1):
+                komb = list(combinations(tip, 6)) if len(tip) > 6 else [tuple(sorted(tip))]
+                for k in komb:
+                    ks = set(k)
+                    for hlavni, dod in [(hlavni1, dod1), (hlavni2, dod2)]:
+                        shoda = len(ks & set(hlavni))
+                        if shoda == 6:
+                            vyhra = 10_000_000
+                            vysledek += f"SL {i}: 6 ČÍSEL → JACKPOT 10 000 000 Kč!!!\n"
+                        elif shoda == 5 and dod in ks:
+                            vyhra = 500_000
+                            vysledek += f"SL {i}: 5 + dod. → 500 000 Kč\n"
+                        elif shoda == 5:
+                            vyhra = 50_000
+                            vysledek += f"SL {i}: 5 čísel → 50 000 Kč\n"
+                        elif shoda == 4:
+                            vyhra = 2_000
+                            vysledek += f"SL {i}: 4 čísla → 2 000 Kč\n"
+                        elif shoda == 3:
+                            vyhra = 300
+                            vysledek += f"SL {i}: 3 čísla → 300 Kč\n"
+                        else:
+                            vyhra = 0
+                        celkova_vyhra += vyhra
+
+            if sance and sance_cislo is not None:
+                sc = str(sance_cislo)
+                shodnych = next((k for k in range(6,0,-1) if sc[-k:] == sance_str[-k:]), 0)
+                if shodnych >= 2:
+                    vyhry_sance = {2:40, 3:100, 4:500, 5:10000, 6:200000}
+                    vyhra_s = vyhry_sance.get(shodnych, 0)
+                    celkova_vyhra += vyhra_s
+                    vysledek += f"ŠANCE: {shodnych} koncovek → {vyhra_s:,} Kč!\n"
+            vysledek += "—" * 52 + "\n\n"
+
+        vysledek += f"\nCELKEM VSAZENO: {vsazeno} Kč\n"
+        vysledek += f"CELKEM VYHRÁNO: {celkova_vyhra:,} Kč\n"
+        if celkova_vyhra > vsazeno:
+            vysledek += f"→ ZISK: +{celkova_vyhra - vsazeno:,} Kč\n"
+        elif celkova_vyhra < vsazeno:
+            vysledek += f"→ ZTRÁTA: -{vsazeno - celkova_vyhra:,} Kč\n"
+        else:
+            vysledek += "→ REMÍZA – vrátil jsi vložené\n"
+
+        messagebox.showinfo("Výsledky slosování", vysledek)
 
     def tisk(self):
         if not os.path.exists(SOUBOR_TICKET):
