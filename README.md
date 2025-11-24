@@ -1,0 +1,1 @@
+# sazka-simul-tor
