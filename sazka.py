@@ -4,58 +4,79 @@ import random
 from itertools import combinations
 from math import comb
 import os
+
 SOUBOR_TICKET = "ticket.txt"
 CENA_KOMB = 20
 CENA_SANCE = 20
+
 class SportkaApp:
     def __init__(self):
         self.root = tk.Tk()
+        self.root.tk.call("tk", "scaling", 2.0)          # VŠECHNO 2× větší – super řešení!
         self.root.title("Sportka od Sazky")
-        self.root.geometry("900x750")
+        self.root.geometry("900x750")                    # velikost zůstává, ale obsah je 2×
+        self.root.resizable(True, True)                 # můžeš okno libovolně měnit
         self.root.config(bg="black")
-        self.root.resizable(False, False)
+
         tk.Label(self.root, text="SPORTKA", font=("Arial", 19, "bold"), bg="black", fg="#FF8C00").pack(pady=(40, 5))
         tk.Label(self.root, text="SAZKA", font=("Arial", 13, "bold"), bg="black", fg="white").pack(pady=(0, 40))
+
         Button(self.root, text="Ticket", font=("Arial", 7, "bold"), width=36, height=6, bg="#FF8C00", fg="white", relief="flat", command=self.otevri_ticket).pack(pady=12)
         Button(self.root, text="Slosovat", font=("Arial", 7, "bold"), width=36, height=6, bg="#0078D4", fg="white", relief="flat", command=self.slosovani).pack(pady=12)
         Button(self.root, text="Tisk", font=("Arial", 7, "bold"), width=36, height=6, bg="#107C10", fg="white", relief="flat", command=self.tisk).pack(pady=12)
         Button(self.root, text="Reset", font=("Arial", 7, "bold"), width=36, height=6, bg="#D13438", fg="white", relief="flat", command=self.reset).pack(pady=12)
+
         self.root.mainloop()
+
     def otevri_ticket(self):
         if hasattr(self, 'ticket_window') and self.ticket_window.winfo_exists():
             self.ticket_window.lift()
             return
+
         self.ticket_window = Toplevel(self.root)
         self.ticket_window.title("Vyplň ticket Sportky")
-        self.ticket_window.geometry("1600x950")
+        self.ticket_window.geometry("3200x1900")        # velké okno, vše se vejde i při 2× zvětšení
+        self.ticket_window.resizable(True, True)
         self.ticket_window.config(bg="#FF8C00")
-        tk.Label(self.ticket_window, text="SPORTKA", font=("Arial", 13, "bold"), bg="#FF8C00", fg="white").pack(pady=(6, 2))
-        tk.Label(self.ticket_window, text="SAZKA", font=("Arial", 8, "bold"), bg="#FF8C00", fg="black").pack(pady=(0, 8))
+
+        # Nadpisy
+        tk.Label(self.ticket_window, text="SPORTKA", font=("Arial", 26, "bold"), bg="#FF8C00", fg="white").pack(pady=(12, 4))
+        tk.Label(self.ticket_window, text="SAZKA", font=("Arial", 16, "bold"), bg="#FF8C00", fg="black").pack(pady=(0, 16))
+
+        # Scrollovatelný canvas pro 10 sloupců
         canvas = tk.Canvas(self.ticket_window, bg="#FF8C00", highlightthickness=0)
         scrollbar = tk.Scrollbar(self.ticket_window, orient="horizontal", command=canvas.xview)
         canvas.configure(xscrollcommand=scrollbar.set)
         scrollbar.pack(side="bottom", fill="x")
         canvas.pack(side="top", fill="both", expand=True)
+
         self.scroll_frame = tk.Frame(canvas, bg="#FF8C00")
         canvas.create_window((0,0), window=self.scroll_frame, anchor="nw")
+
         def on_configure(event):
             canvas.configure(scrollregion=canvas.bbox("all"))
         self.scroll_frame.bind("<Configure>", on_configure)
+
         self.vars = [{} for _ in range(10)]
         self.pocet_labels = []
+
         for sl in range(10):
             frame_sloupec = tk.Frame(self.scroll_frame, bg="#FF8C00")
-            frame_sloupec.pack(side="left", padx=15, pady=20)
-            tk.Label(frame_sloupec, text=f"{sl+1}.", font=("Arial", 5, "bold"), bg="#FF8C00", fg="black").pack()
+            frame_sloupec.pack(side="left", padx=30, pady=40)
+
+            tk.Label(frame_sloupec, text=f"{sl+1}.", font=("Arial", 10, "bold"), bg="#FF8C00", fg="black").pack()
             pocet_var = tk.StringVar(value="0 vybráno")
             self.pocet_labels.append(pocet_var)
-            tk.Label(frame_sloupec, textvariable=pocet_var, font=("Arial", 3, "bold"), bg="#FF8C00", fg="black").pack(pady=2)
+            tk.Label(frame_sloupec, textvariable=pocet_var, font=("Arial", 6, "bold"), bg="#FF8C00", fg="black").pack(pady=4)
+
             btns_frame = tk.Frame(frame_sloupec, bg="#FF8C00")
-            btns_frame.pack(pady=1)
-            Button(btns_frame, text="Náhodný tip", font=("Arial", 2, "bold"), bg="white", fg="black", command=lambda s=sl: self.nahodny_tip(s)).pack(side="left", padx=2)
-            Button(btns_frame, text="Smazat sloupec", font=("Arial", 2, "bold"), bg="#CC0000", fg="white", command=lambda s=sl: self.clear_sloupec(s)).pack(side="left")
+            btns_frame.pack(pady=2)
+            Button(btns_frame, text="Náhodný tip", font=("Arial", 4, "bold"), bg="white", fg="black", command=lambda s=sl: self.nahodny_tip(s)).pack(side="left", padx=4)
+            Button(btns_frame, text="Smazat sloupec", font=("Arial", 4, "bold"), bg="#CC0000", fg="white", command=lambda s=sl: self.clear_sloupec(s)).pack(side="left")
+
             grid = tk.Frame(frame_sloupec, bg="#FF8C00")
-            grid.pack(pady=3)
+            grid.pack(pady=6)
+
             for r in range(7):
                 for c in range(7):
                     cislo = r * 7 + c + 1
@@ -68,41 +89,51 @@ class SportkaApp:
                                          indicatoron=False,
                                          bg="white", fg="black",
                                          selectcolor="#00CC00",
-                                         font=("Arial", 3, "bold"),
+                                         font=("Arial", 6, "bold"),
                                          width=5, height=2,
                                          bd=2, relief="raised",
                                          command=lambda s=sl: self.update_count(s))
-                    chk.grid(row=r, column=c, padx=2, pady=2)
+                    chk.grid(row=r, column=c, padx=4, pady=4)
+
+        # Dolní část (Slosování + Šance + tlačítko Uložit)
         dolni = tk.Frame(self.ticket_window, bg="#FF8C00")
-        dolni.pack(fill="x", pady=6)
+        dolni.pack(fill="x", pady=12)
+
         slos_frame = tk.Frame(dolni, bg="#FF8C00")
-        slos_frame.pack(side="left", padx=12)
-        tk.Label(slos_frame, text="2. Slosování", font=("Arial", 3, "bold"), bg="#FF8C00").pack()
+        slos_frame.pack(side="left", padx=24)
+
+        tk.Label(slos_frame, text="2. Slosování", font=("Arial", 6, "bold"), bg="#FF8C00").pack()
         self.streda_var = BooleanVar(value=True)
         self.patek_var = BooleanVar(value=True)
         self.nedele_var = BooleanVar(value=True)
+
         f1 = tk.Frame(slos_frame, bg="#FF8C00")
-        f1.pack(pady=2)
-        Checkbutton(f1, text="Středeční", variable=self.streda_var, bg="#FF8C00", font=("Arial", 3)).pack(side="left", padx=3)
-        Checkbutton(f1, text="Páteční", variable=self.patek_var, bg="#FF8C00", font=("Arial", 3)).pack(side="left", padx=3)
-        Checkbutton(f1, text="Nedělní", variable=self.nedele_var, bg="#FF8C00", font=("Arial", 3)).pack(side="left", padx=3)
-        tk.Label(slos_frame, text="Počet slosování:", font=("Arial", 3), bg="#FF8C00").pack(pady=4)
+        f1.pack(pady=4)
+        Checkbutton(f1, text="Středeční", variable=self.streda_var, bg="#FF8C00", font=("Arial", 6)).pack(side="left", padx=6)
+        Checkbutton(f1, text="Páteční", variable=self.patek_var, bg="#FF8C00", font=("Arial", 6)).pack(side="left", padx=6)
+        Checkbutton(f1, text="Nedělní", variable=self.nedele_var, bg="#FF8C00", font=("Arial", 6)).pack(side="left", padx=6)
+
+        tk.Label(slos_frame, text="Počet slosování:", font=("Arial", 6), bg="#FF8C00").pack(pady=8)
         self.pocet_slos_var = IntVar(value=1)
-        Spinbox(slos_frame, from_=1, to=52, width=6, font=("Arial", 3), textvariable=self.pocet_slos_var).pack(pady=1)
+        Spinbox(slos_frame, from_=1, to=52, width=6, font=("Arial", 6), textvariable=self.pocet_slos_var).pack(pady=2)
+
         sance_frame = tk.Frame(dolni, bg="#FF8C00")
-        sance_frame.pack(side="right", padx=20)
-        tk.Label(sance_frame, text="3. Šance", font=("Arial", 3, "bold"), bg="#FF8C00").pack()
+        sance_frame.pack(side="right", padx=40)
+        tk.Label(sance_frame, text="3. Šance", font=("Arial", 6, "bold"), bg="#FF8C00").pack()
         self.sance_var = IntVar(value=0)
         rframe = tk.Frame(sance_frame, bg="#FF8C00")
-        rframe.pack(pady=2)
-        Radiobutton(rframe, text="Ano", variable=self.sance_var, value=1, bg="#FF8C00", selectcolor="black", font=("Arial", 3, "bold")).pack(side="left", padx=6)
-        Radiobutton(rframe, text="Ne", variable=self.sance_var, value=0, bg="#FF8C00", selectcolor="black", font=("Arial", 3, "bold")).pack(side="left", padx=6)
-        Button(dolni, text="ULOŽIT SÁZKU", font=("Arial", 4, "bold"), bg="#006600", fg="white", width=44, height=4, command=self.uloz_ticket).pack(pady=6)
+        rframe.pack(pady=4)
+        Radiobutton(rframe, text="Ano", variable=self.sance_var, value=1, bg="#FF8C00", selectcolor="black", font=("Arial", 6, "bold")).pack(side="left", padx=12)
+        Radiobutton(rframe, text="Ne", variable=self.sance_var, value=0, bg="#FF8C00", selectcolor="black", font=("Arial", 6, "bold")).pack(side="left", padx=12)
+
+        Button(dolni, text="ULOŽIT SÁZKU", font=("Arial", 8, "bold"), bg="#006600", fg="white", width=44, height=4, command=self.uloz_ticket).pack(pady=12)
+
     def update_count(self, sloupec):
         count = sum(var.get() for var in self.vars[sloupec].values())
         if count > 12:
             messagebox.showwarning("Limit", "Maximálně 12 čísel na sloupec!")
         self.pocet_labels[sloupec].set(f"{count} vybráno")
+
     def nahodny_tip(self, sloupec):
         for var in self.vars[sloupec].values():
             var.set(0)
@@ -110,10 +141,12 @@ class SportkaApp:
         for c in cisla:
             self.vars[sloupec][c].set(1)
         self.update_count(sloupec)
+
     def clear_sloupec(self, sloupec):
         for var in self.vars[sloupec].values():
             var.set(0)
         self.update_count(sloupec)
+
     def uloz_ticket(self):
         vyplneno = any(len({c for c, v in self.vars[sl].items() if v.get() == 1}) >= 6 for sl in range(10))
         if not vyplneno:
@@ -134,6 +167,7 @@ class SportkaApp:
                 f.write(f"Šance_číslo: {sance_cislo:06d}\n")
         messagebox.showinfo("Hotovo", "Ticket uložen!")
         self.ticket_window.destroy()
+
     def slosovani(self):
         if not os.path.exists(SOUBOR_TICKET):
             messagebox.showerror("Chyba", "Nejprve vyplň a ulož ticket!")
@@ -217,6 +251,7 @@ class SportkaApp:
         else:
             vysledek += "→ REMÍZA – vrátil jsi vložené 😐\n"
         messagebox.showinfo("Výsledky slosování", vysledek)
+
     def tisk(self):
         if not os.path.exists(SOUBOR_TICKET):
             messagebox.showerror("Chyba", "Žádný ticket k tisku!")
@@ -226,10 +261,13 @@ class SportkaApp:
             with open(SOUBOR_TICKET, "r", encoding="utf-8") as src:
                 f.write(src.read())
         messagebox.showinfo("Tisk", "Ticket uložen jako vytisteny_ticket.txt")
+
     def reset(self):
         if os.path.exists(SOUBOR_TICKET):
             os.remove(SOUBOR_TICKET)
         messagebox.showinfo("Reset", "Vše vymazáno – začínáš znovu!")
         self.root.destroy()
         SportkaApp()
+
+# Spuštění aplikace
 SportkaApp()
