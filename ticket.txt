@@ -1,0 +1,7 @@
+Sloupec 1: 3,12,19,21,22,41
+Sloupec 2: 16,23,38,43,46,47
+Středeční: Ano
+Páteční: Ano
+Nedělní: Ano
+Počet slosování: 1
+Šance: Ne
