@@ -1,7 +1,5 @@
 # Sportka Simulator 2025
 
-![Sportka Logo](https://i.imgur.com/8fZ2p1L.png)
-
 **Nejlepší český simulátor Sportky v Pythonu** – velké písmo, krásný design, náhodné vyplňování celého ticketu, přesné slosování, tisk ticketu a všechno funguje na první dobrou!
 
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
@@ -49,7 +47,7 @@ Hotovo! Hraj, tipuj, slosuj a vyhrávej (aspoň v simulaci)
 ## Proč je to nejlepší Sportka simulátor?
 
 - Žádné otravné messageboxy při náhodném vyplnění  
-- Přesná cena 200 Kč / 220 Kč (už žádné 220 Kč omylem)  
+- Přesná cena 200 Kč / 220 Kč
 - Super čistý kód s komentáři  
 - Vše funguje na Windows, macOS i Linux  
 - Vypadá jako moderní aplikace, ne jako školní projekt z roku 2005
@@ -60,7 +58,6 @@ Hotovo! Hraj, tipuj, slosuj a vyhrávej (aspoň v simulaci)
 Full-stack vývojář | Python | Tkinter | Design  
 
 [![GitHub](https://img.shields.io/badge/GitHub-000000?style=flat&logo=github&logoColor=white)](https://github.com/VitaPhoneCZ)  
-[![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat&logo=youtube&logoColor=white)](https://youtube.com/@vitaphone)
 
 > „Když už hrát Sportku, tak aspoň s pořádným simulátorem.“
 
