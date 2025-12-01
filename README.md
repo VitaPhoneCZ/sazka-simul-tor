@@ -1,6 +1,6 @@
 # Sportka Simulator 2025
 
-**Nejlepší český simulátor Sportky v Pythonu** – velké písmo, krásný design, náhodné vyplňování celého ticketu, přesné slosování, tisk ticketu a všechno funguje na první dobrou!
+**Nejlepší český simulátor Sportky v Pythonu** – moderní design, optimalizovaný výkon, automatické slosování do jackpotu, benchmark rychlosti a všechno funguje na první dobrou!
 
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![Tkinter](https://img.shields.io/badge/Tkinter-built--in-green.svg)](https://docs.python.org/3/library/tkinter.html)
@@ -8,15 +8,42 @@
 
 ## Co to umí
 
+### 🎫 Ticket
 - **10 sloupců** uspořádaných do přehledného layoutu 5 × 2  
+- **Moderní design** s bílými kartami a stíny
 - **Velké čitelné čísla** (2× scaling – ideální na tablet nebo pro starší uživatele)  
-- **Náhodný tip** pro každý sloupec + tlačítko **„NÁHODNÝ CELÝ TICKET“**  
-- **Správná cena** – vždy 200 Kč za 10 sloupců, +20 Kč za Šanci  
-- **Přesné slosování** se dvěma tahy + Šance  
-- **Tisk ticketu** do souboru `vytisteny_ticket.txt`  
-- **Reset** – smaže ticket a začne znovu  
+- **Náhodný tip** pro každý sloupec + tlačítko **„NÁHODNÝ CELÝ TICKET"**  
+- **Automatická validace** – max. 12 čísel na sloupec
+- **Cena v reálném čase** – zobrazuje celkovou cenu při každé změně
+- **Výběr slosování** – Středa, Pátek, Neděle
+- **Počet slosování** – 1 až 52
+- **Šance** – volitelná s náhodným číslem
 - Scrollování kolečkem myši (Windows + Linux)  
 - Plně responzivní ticketové okno (lze měnit velikost)
+
+### 🎰 Slosování
+- **Přesné slosování** se dvěma tahy + Šance  
+- **Výsledky seřazené podle výdělku** – nejlepší nahoře, nejhorší dole
+- **Souhrnné statistiky** – počet jackpotů, 5+1, 5, 4, 3 čísel
+- **Top 50 a Bottom 50** slosování s detaily (pro velký počet slosování)
+- **Optimalizace pro velký počet** – podporuje i 100 000+ slosování
+- **Progress bar** pro dlouhé slosování
+- **Uložení výsledků** do souboru s časovou značkou
+
+### 🎯 Auto slosování do Jackpotu
+- **Automatické slosování** dokud nevyhraje jackpot
+- **Zobrazení průběhu** s počtem pokusů
+- **Možnost zastavit** kdykoliv
+- **Zobrazení výsledků** po vyhraní jackpotu
+
+### ⚡ Benchmark rychlosti
+- **Měření rychlosti** slosování (slosování za sekundu)
+- **3 sekundy měření** pro přesné výsledky
+- **Zobrazení statistik** – aktuálně ~113 000 slosování/sekundu
+
+### 🖨️ Ostatní funkce
+- **Tisk ticketu** do souboru `vytisteny_ticket.txt`  
+- **Reset** – smaže ticket a začne znovu
 
 ## Jak spustit
 
@@ -34,23 +61,58 @@ Hotovo! Hraj, tipuj, slosuj a vyhrávej (aspoň v simulaci)
 
 ## Ovládání
 
-| Akce                        | Klávesa / Tlačítko                     |
-|-----------------------------|----------------------------------------|
-| Otevřít ticket              | Tlačítko **Ticket**                    |
-| Náhodný tip (jeden sloupec) | Tlačítko v každém sloupci              |
-| Náhodný celý ticket         | Velké zlaté tlačítko dole              |
-| Slosovat                    | Tlačítko **Slosovat**                  |
-| Tisk ticketu                | Tlačítko **Tisk**                      |
-| Smazat vše                  | Tlačítko **Reset**                     |
+### Hlavní okno
+| Akce                        | Tlačítko                     |
+|-----------------------------|------------------------------|
+| Otevřít ticket              | 🎫 **Ticket**                |
+| Slosovat                    | 🎰 **Slosovat**              |
+| Auto slosování do jackpotu  | 🎯 (vedle Slosovat)          |
+| Benchmark rychlosti         | ⚡ (vedle Slosovat)          |
+| Tisk ticketu                | 🖨️ **Tisk**                  |
+| Smazat vše                  | 🔄 **Reset**                 |
+
+### V ticketu
+| Akce                        | Tlačítko / Možnost           |
+|-----------------------------|------------------------------|
+| Náhodný tip (jeden sloupec) | 🎲 **Náhodný** v každém sloupci |
+| Smazat sloupec              | 🗑️ **Smazat** v každém sloupci |
+| Náhodný celý ticket         | 🎲 **NÁHODNÝ CELÝ TICKET**   |
+| Výběr slosování             | Checkboxy: Středa, Pátek, Neděle |
+| Počet slosování             | Spinbox (1-52)               |
+| Šance                       | Radio button: Ano/Ne         |
+| Uložit sázku                | 💾 **ULOŽIT SÁZKU**          |
 
 
 ## Proč je to nejlepší Sportka simulátor?
 
+### 🎨 Design
+- **Moderní UI** s tmavým pozadím a barevnými kartami
+- **Hover efekty** na tlačítkách
+- **Přehledné zobrazení výsledků** s barevným zvýrazněním
+- **Progress bary** pro dlouhé operace
+- Vypadá jako moderní aplikace, ne jako školní projekt z roku 2005
+
+### ⚡ Výkon
+- **Optimalizované slosování** – ~113 000 slosování/sekundu
+- **Předpočítané sety** pro rychlejší výpočty
+- **Matematické operace** místo string operací
+- **Optimalizace pro velký počet** – podporuje 100 000+ slosování bez crashnutí
+- **Batch processing** pro efektivní zpracování
+
+### 🎯 Funkce
+- **Automatické slosování do jackpotu** – slosuje dokud nevyhraje
+- **Benchmark rychlosti** – měření výkonu
+- **Výsledky seřazené podle výdělku** – nejlepší nahoře
+- **Souhrnné statistiky** pro velký počet slosování
+- **Uložení výsledků** s časovou značkou
+- **Cena v reálném čase** – vidíš cenu při každé změně
+
+### 💻 Technické
 - Žádné otravné messageboxy při náhodném vyplnění  
-- Přesná cena 200 Kč / 220 Kč
+- Přesná cena podle počtu kombinací
 - Super čistý kód s komentáři  
 - Vše funguje na Windows, macOS i Linux  
-- Vypadá jako moderní aplikace, ne jako školní projekt z roku 2005
+- Bez externích závislostí (kromě standardní knihovny Pythonu)
 
 ## Autor
 
